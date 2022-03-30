@@ -27,5 +27,11 @@ namespace University.Web.Controllers
             var coursesDTO = coursesModel.Select(x => mapper.Map<CourseDTO>(x));
             return Json(coursesDTO,JsonRequestBehavior.AllowGet );
         }
+
+        [HttpGet]
+        public ActionResult Create()
+        {
+            return PartialView(new CourseDTO());
+        }
     }
 }
