@@ -6,14 +6,12 @@
 <h2>Courses</h2>
 
 <!-- Button trigger modal -->
-<button id="create" type="button" class="btn btn-primary">
-    Launch demo modal
-</button>
+<button id="create" type="button" class="btn btn-success">New</button>
 <hr />
 
 <div id="rowCourses">
-    <div ad="divCourses">
-        <table id="tableCourses" style="width:100%" class="table table-bordered"></table>
+    <div id="divCourses">
+        <table id="tableCourses" class="table table-bordered" style="width:100%"></table>
     </div>
 </div>
 
@@ -27,27 +25,23 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <div class="modal-body">
-            </div>
+            <div class="modal-body"></div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-
     $(document).ready(function () {
         getCourses();
     });
-
     $("#create").click(function () {
         $("#modalCourses .modal-body", this).empty();
         $("#modalCourses .modal-body").load("/Courses/Create");
         $("#modalCourses").modal("show");
     });
-
     function getCourses() {
         var $row = $('#rowCourses');
         $('#divCourses').remove();
@@ -60,11 +54,9 @@
         $table.attr({ id: 'tableCourses', width: '100%' });
         $div.append($table);
         $row.append($div);
-
         $.get('/Courses/IndexJson').done(function (data) {
             $.notify("Load data", "info");
             console.table(data);
-
             table = $('#tableCourses').DataTable({
                 data: data,
                 "iDisplayLength": 10,
@@ -85,23 +77,29 @@
                     }
                 ]
             });
-
             $('#tableCourses').on('click', 'tbody a.edit', function (e) {
                 let id = $(this).parent().siblings('td')[0].innerText;
-
-                $('#modal .modal-body', this).empty();
-                $('#modal .modal-body').load('/Controller/Action/' + id);
-                $("#modal").modal("show");
+                $('#modalCourses .modal-body', this).empty();
+                $('#modalCourses .modal-body').load('/Courses/Edit/' + id);
+                $("#modalCourses").modal("show");
             });
-
-            $('#tableCourse').on('click', 'tbody a.delete', function (data) {
+            $('#tableCourses').on('click', 'tbody a.delete', function (data) {
                 let id = $(this).parent().siblings('td')[0].innerText;
-                //delete (id);
+                deleteCourse(id);
             });
-
         }).fail(function (data) {
             console.table(data);
         });
     }
-
+    function deleteCourse(id) {
+        $.get("/Courses/Delete/" + id).done(function (data) {
+            if (data.IsSuccess) {
+                getCourses();
+            } else {
+                $.notify(data.Message, "error");
+            }
+        }).fail(function (data) {
+            console.table(data);
+        })
+    }
 </script>
