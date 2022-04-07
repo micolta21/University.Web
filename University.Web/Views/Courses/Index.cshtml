@@ -5,6 +5,9 @@
 
 <h2>Courses</h2>
 
+<select> id="CourseSelect" class="form-control" </select>
+<hr />
+
 <!-- Button trigger modal -->
 <button id="create" type="button" class="btn btn-success">New</button>
 <hr />
@@ -36,6 +39,7 @@
 <script>
     $(document).ready(function () {
         getCourses();
+        getCoursesList();
     });
     $("#create").click(function () {
         $("#modalCourses .modal-body", this).empty();
@@ -94,12 +98,25 @@
     function deleteCourse(id) {
         $.get("/Courses/Delete/" + id).done(function (data) {
             if (data.IsSuccess) {
+                
                 getCourses();
             } else {
                 $.notify(data.Message, "error");
             }
         }).fail(function (data) {
             console.table(data);
+            swal("notification", "The proccess is failed", "error")
         })
+    }
+
+    function getCoursesList() {
+        $.get('/Courses/GetCourses', function (data) {
+            $("#CourseSelect").empty();
+            $("#CourseSelect").select2({
+                placeholder: "Seleccione",
+                data: JSON.parse(data)
+            });
+            $("#CourseSelect").val("").trigger("change");
+        });
     }
 </script>
