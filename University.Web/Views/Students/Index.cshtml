@@ -5,7 +5,7 @@
 <h2>Students</h2>
 <!-- Button trigger modal -->
 <button id="create" type="button" class="btn btn-success">
-    <i class="fas fa-users-plus"> </i> Crear
+    <i class="fas fa-user-plus"> </i> Crear
 </button>
 <hr />
 <div id="rowStudents">
@@ -97,7 +97,7 @@
     function deleteStudent(id) {
         $.get("/Students/Delete/" + id).done(function (data) {
             if (data.IsSuccess) {
-                getCourses();
+                getStudents();
             } else {
                 $.notify(data.Message, "error")
             }
