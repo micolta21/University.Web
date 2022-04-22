@@ -1,0 +1,122 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>OfficeAssignment</h2>
+
+<!-- Button trigger modal -->
+<button id="create" type="button" class="btn btn-success">New</button>
+<hr />
+
+
+
+<div id="rowOfficeAssignment">
+    <div id="divOfficeAssignment">
+        <table id="tableOfficeAssignment" class="table table-bordered" style="width:100%"></table>
+    </div>
+</div>
+
+<div class="modal fade" id="modalOfficeAssignment" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">OfficeAssignment</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <!-- <select> id="OfficeAssignmentSelect" class="form-control" </select>
+        <hr /> -->
+            <div class="modal-body"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            getOfficeAssignment();
+            getOfficeAssignmentList();
+        });
+        $("#create").click(function () {
+            $("#modalOfficeAssignment .modal-body", this).empty();
+            $("#modalOfficeAssignment .modal-body").load("/OfficeAssignment/Create");
+            $("#modalOfficeAssignment").modal("show");
+        });
+        function getOfficeAssignment() {
+            var $row = $('#rowOfficeAssignment');
+            $('#divOfficeAssignment').remove();
+            var $div = $('<div></div>');
+            $div.addClass('table-responsive mb-5');
+            $div.attr({ id: 'divOfficeAssignment' });
+            $div.addClass('divOfficeAssignment mb-5');
+            var $table = $("<table></table>");
+            $table.addClass('table table-bordered display text-center');
+            $table.attr({ id: 'tableOfficeAssignment', width: '100%' });
+            $div.append($table);
+            $row.append($div);
+            $.get('/OfficeAssignment/IndexJson').done(function (data) {
+                $.notify("Load data", "info");
+                console.table(data);
+                table = $('#tableOfficeAssignment').DataTable({
+                    data: data,
+                    "iDisplayLength": 10,
+                    "order": [[0, "desc"]],
+                    columns: [
+                        { title: 'ID', data: 'InstructorID', className: 'd-none' },
+                        { title: 'Location', data: 'Location' },
+                        { title: 'Options', data: null }
+
+                    ],
+                    columnDefs: [
+                        {
+                            targets: 2,
+                            render: function (data, type, row) {
+                                return '<a href="javascript:void" class="btn btn-warning edit">Edit</a>' +
+                                    '<a href="javascript:void" class="btn btn-danger delete">Delete</a>';
+                            }
+                        }
+                    ]
+                });
+                $('#tableOfficeAssignment').on('click', 'tbody a.edit', function (e) {
+                    let id = $(this).parent().siblings('td')[0].innerText;
+                    $('#modalOfficeAssignment .modal-body', this).empty();
+                    $('#modalOfficeAssignment .modal-body').load('/OfficeAssignment/Edit/' + id);
+                    $("#modalOfficeAssignments").modal("show");
+                });
+                $('#tableOfficeAssignment').on('click', 'tbody a.delete', function (data) {
+                    let id = $(this).parent().siblings('td')[0].innerText;
+                    deleteOfficeAssignment(id);
+                });
+            }).fail(function (data) {
+                console.table(data);
+            });
+        }
+        function deleteCourse(id) {
+            $.get("/OfficeAssignment/Delete/" + id).done(function (data) {
+                if (data.IsSuccess) {
+
+                    getOfficeAssignment();
+                } else {
+                    $.notify(data.Message, "error");
+                }
+            }).fail(function (data) {
+                console.table(data);
+                swal("notification", "The proccess is failed", "error")
+            })
+        }
+
+        function getOfficeAssignmentList() {
+            $.get('/OfficeAssignment/GetOfficeAssignment', function (data) {
+                $("#OfficeAssignmentSelect").empty();
+                $("#OfficeAssignmentSelect").select2({
+                    placeholder: "Seleccione",
+                    data: JSON.parse(data)
+                });
+                $("#OfficeAssignmentSelect").val("").trigger("change");
+            });
+        }
+    </script>
